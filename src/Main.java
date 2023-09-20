@@ -3,69 +3,30 @@ import java.util.Scanner;
 public class Main {
     public static void main(String[] args) {
         Scanner input = new Scanner(System.in);
+        AnalisadorLexico analisador = new AnalisadorLexico(); // instanciando o objeto 
+        String argumentos = "";
+        char analiseCharArgs;
+      
 
         System.out.println("----------código fonte----------");
-        String argumentos = input.next();
-
-        if (isNum(argumentos)) {
-            if (isNumInt(argumentos)) {
-                System.out.println("Número inteiro!");
-            } else if (isNumDec(argumentos)) {
-                System.out.println("Número decimal!");
-            }
-        }
-
-    }
-
-    public static boolean isNum(String argumentos) {
-        if (argumentos.charAt(0) == '.' || argumentos.charAt(argumentos.length() - 1) == '.') { //caso padrão
-            return false;
-        }
-
-        int count = 0;
+        argumentos = input.nextLine(); // todos os argumentos digitados
 
         for (int i = 0; i < argumentos.length(); i++) {
-            char analiseChar = argumentos.charAt(i);
 
-              if (analiseChar == '.') {
-                count++; 
-    
-                if (count > 1) {
-                    return false;
-                }
+            analiseCharArgs = argumentos.charAt(i); // armazena o caracter atual.
+
+            if (analiseCharArgs == ' ') { // caso o caracter analisador for igual a ' ', quer dizer que o primeiro lexema foi formado //IMPORTANTE: CONDIÇÃO DO ULTIMO CARACTER DO CÓDIGO!!
+
+                analisador.categorizarLexema(); // categorizando o lexema      
 
             }
 
-            if (!(analiseChar >= '0' && analiseChar <= '9') && analiseChar != '.') {
-                return false;
-            } 
-        }
-        return true;
-    }
-
-    public static boolean isNumInt(String argumentos) {
-
-        for (int i = 0; i < argumentos.length(); i++) {
-            char analiseChar = argumentos.charAt(i);
-
-            if (analiseChar == '.') {
-                return false;
+            if (analiseCharArgs != ' ') { //lexema é apenas a palavra!
+                analisador.adicionarAoLexema(analiseCharArgs); // incrementa todos os caracteres para formar o lexema
             } 
 
-            }
-        return true;
-    }
-
-    public static boolean isNumDec(String argumentos) {
-
-        for (int i = 0; i < argumentos.length(); i++) {
-            char analiseChar = argumentos.charAt(i);
-
-            if (analiseChar == '.') {   
-                return true;
-            }
         }
-        return false;
+
     }
-    
- }
+
+}
