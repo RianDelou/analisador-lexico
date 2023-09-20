@@ -3,30 +3,27 @@ import java.util.Scanner;
 public class Main {
     public static void main(String[] args) {
         Scanner input = new Scanner(System.in);
-        AnalisadorLexico analisador = new AnalisadorLexico(); // instanciando o objeto 
-        String argumentos = "";
-        char analiseCharArgs;
-      
+        AnalisadorLexico analisador = new AnalisadorLexico(); // Instancia o objeto AnalisadorLexico
 
-        System.out.println("----------código fonte----------");
-        argumentos = input.nextLine(); // todos os argumentos digitados
+        System.out.println("Digite várias linhas de texto (pressione Enter após cada linha).");
+        System.out.println("Digite uma linha em branco para encerrar a entrada:");
 
-        for (int i = 0; i < argumentos.length(); i++) {
+        StringBuilder inputText = new StringBuilder();
+         String argumentos;
+         String armazenar = "";
+        while (true) {
+            argumentos = input.nextLine(); // Lê uma linha de entrada
 
-            analiseCharArgs = argumentos.charAt(i); // armazena o caracter atual.
-
-            if (analiseCharArgs == ' ') { // caso o caracter analisador for igual a ' ', quer dizer que o primeiro lexema foi formado //IMPORTANTE: CONDIÇÃO DO ULTIMO CARACTER DO CÓDIGO!!
-
-                analisador.categorizarLexema(); // categorizando o lexema      
-
+            armazenar += argumentos;
+            if (argumentos.isEmpty()) {
+                break; // Sai do loop se a linha estiver em branco
             }
 
-            if (analiseCharArgs != ' ') { //lexema é apenas a palavra!
-                analisador.adicionarAoLexema(analiseCharArgs); // incrementa todos os caracteres para formar o lexema
-            } 
-
+            armazenar += " JUMPLINE ";
+            inputText.append(argumentos).append("\n");
         }
 
-    }
+        System.out.println(armazenar);
 
+    }
 }

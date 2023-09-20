@@ -138,7 +138,19 @@ public class AnalisadorLexico {
         }
     }
 
-    public boolean isConstanteDeTesto(String lexema) {
+    public boolean isConstanteDeTexto(String lexema) {
+        
+    }
+
+    public boolean isComentarios(String lexema) {
+
+    }
+
+    public boolean isOperadores() {
+
+    }
+
+    public boolean isSimbolosEspeciais() {
 
     }
 
