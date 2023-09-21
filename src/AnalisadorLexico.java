@@ -61,7 +61,7 @@ public class AnalisadorLexico {
     }
 
     public void categorizarLexema() {
-
+        
         if (isNum(lexema)) {
                     
             if (isNumInt(lexema)) {
@@ -74,6 +74,10 @@ public class AnalisadorLexico {
 
         } else if  (isPalavraReservada(lexema)) { //primeiro verificar se tem palavra reservada 
             System.out.println(this.lexema+" Palavra Reservada!");
+            this.lexema = "";
+        }
+
+        if (lexema.equals("J")) { //quebra de linha
             this.lexema = "";
         }
 

@@ -3,27 +3,45 @@ import java.util.Scanner;
 public class Main {
     public static void main(String[] args) {
         Scanner input = new Scanner(System.in);
-        AnalisadorLexico analisador = new AnalisadorLexico(); // Instancia o objeto AnalisadorLexico
+        AnalisadorLexico analisador = new AnalisadorLexico(); // instanciando o objeto
+        String argumentos = "";
+        String allArgs = "";
+        char analiseCharArgs;
 
-        System.out.println("Digite várias linhas de texto (pressione Enter após cada linha).");
-        System.out.println("Digite uma linha em branco para encerrar a entrada:");
+        System.out.println("----------código fonte----------");
 
-        StringBuilder inputText = new StringBuilder();
-         String argumentos;
-         String armazenar = "";
         while (true) {
-            argumentos = input.nextLine(); // Lê uma linha de entrada
+            argumentos = input.nextLine();
 
-            armazenar += argumentos;
+             allArgs += argumentos; // todos os argumentos
+
             if (argumentos.isEmpty()) {
-                break; // Sai do loop se a linha estiver em branco
+                break; // sai do loop se a linha estiver em branco
             }
 
-            armazenar += " JUMPLINE ";
-            inputText.append(argumentos).append("\n");
+            allArgs += " J "; //talvez mudar o nome
+
         }
 
-        System.out.println(armazenar);
+        for (int i = 0; i < allArgs.length(); i++) {
+
+            analiseCharArgs = allArgs.charAt(i); // armazena o caracter atual.
+
+            if (analiseCharArgs == ' ') { // caso o caracter analisador for igual a ' ', quer dizer que o primeiro
+                                          // lexema foi formado //IMPORTANTE: CONDIÇÃO DO ULTIMO CARACTER DO CÓDIGO!!
+
+                analisador.categorizarLexema(); // categorizando o lexema
+
+            }
+
+            if (analiseCharArgs != ' ') { // lexema é apenas a palavra!
+                analisador.adicionarAoLexema(analiseCharArgs); // incrementa todos os caracteres para formar o lexema
+            }
+
+        }
+
+        System.out.println(allArgs);
 
     }
+
 }
