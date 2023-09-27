@@ -1,5 +1,4 @@
 import java.util.ArrayList;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class AnalisadorLexico {
@@ -126,12 +125,11 @@ public class AnalisadorLexico {
             System.out.println(this.lexema + " Palavra Reservada!");
             this.lexema = "";
 
-        } else if (isConstanteDeTexto(lexema)) { // PRECISA DO LEXEMAAUX
+        } else if (isConstanteDeTexto(lexema)) { // PRECISA DO LEXEMAAUX (!!!!!!!!!!!!!!!)
 
             System.out.println(this.lexemaAux + " Constante de texto!");
             this.lexemaAux = "";
-
-
+            
         }
 
         if (lexema.equals("\n")) { // quebra de linha
@@ -141,7 +139,7 @@ public class AnalisadorLexico {
         this.lexema = ""; // TIRAR ISSO DEPOIS
     }
 
-    private boolean isNum(String argumentos) { // FALTA IDENTIFICAR NUMEROS NEGATIVOS E POSITIVOS
+    private boolean isNum(String argumentos) {
 
         if (argumentos == "" || argumentos.charAt(0) == '.' || argumentos.charAt(argumentos.length() - 1) == '.') { // caso
                                                                                                                     // padrão
@@ -203,33 +201,17 @@ public class AnalisadorLexico {
     }
 
     public boolean isPalavraReservada(String lexema) {
-    if (lexema == null || lexema.isEmpty()) {
-        return false;
+
+        if (lexema == "") { // caso padrão
+            return false;
+        }
+
+        if (this.palavrasReservadas.contains(lexema)) {
+            return true;
+        } else {
+            return false;
+        }
     }
-
-    // Defina um padrão de expressão regular para encontrar chamadas de função com argumentos
-    Pattern pattern = Pattern.compile("\\w+\\(.*\\)");
-
-    // Crie um matcher para encontrar correspondências no lexema
-    Matcher matcher = pattern.matcher(lexema);
-
-    // Verifique se encontrou uma correspondência
-    if (matcher.find()) {
-        String funcaoComArgumento = matcher.group();
-        // Aqui, funcaoComArgumento conterá, por exemplo, "print("a")"
-        // Você pode fazer o que quiser com essa string, por exemplo, imprimir, armazenar, etc.
-
-        // Remova o argumento da chamada de função
-        String funcaoSemArgumento = funcaoComArgumento.replaceFirst("\\(.*\\)", "()");
-        // Agora, funcaoSemArgumento conterá "print()"
-
-        // Você pode verificar se a função sem argumento está na lista de palavras reservadas
-        return this.palavrasReservadas.contains(funcaoSemArgumento);
-    }
-
-    // Se não houver chamada de função, verifique diretamente nas palavras reservadas
-    return this.palavrasReservadas.contains(lexema);
-}
 
     public boolean isConstanteDeTexto(String lexema) {
 
