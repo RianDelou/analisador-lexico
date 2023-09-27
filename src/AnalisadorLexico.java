@@ -1,8 +1,13 @@
 import java.util.ArrayList;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class AnalisadorLexico {
+
+    private int posicionamento = 0;
+    private String allArgs;
     private String lexema = "";
+    private String lexemaAux = "";
     private String token = "";
     private ArrayList<String> palavrasReservadas = new ArrayList<String>();
     private Pattern identificador = Pattern.compile("[a-zA-Z][a-zA-Z0-9]*");
@@ -22,6 +27,38 @@ public class AnalisadorLexico {
         this.palavrasReservadas.add("println");
         this.palavrasReservadas.add("main");
         this.palavrasReservadas.add("return");
+    }
+
+    public String getLexemaAux() {
+        return lexemaAux;
+    }
+
+    public void setLexemaAux(String lexemaAux) {
+        this.lexemaAux = lexemaAux;
+    }
+
+    public int getPosicionamento() {
+        return posicionamento;
+    }
+
+    public void setPosicionamento(int posicionamento) {
+        this.posicionamento = posicionamento;
+    }
+
+    public String getAllArgs() {
+        return allArgs;
+    }
+
+    public void setAllArgs(String allArgs) {
+        this.allArgs = allArgs;
+    }
+
+    public ArrayList<String> getPalavrasReservadas() {
+        return palavrasReservadas;
+    }
+
+    public void setPalavrasReservadas(ArrayList<String> palavrasReservadas) {
+        this.palavrasReservadas = palavrasReservadas;
     }
 
     public Pattern getIdentificador() {
@@ -61,30 +98,53 @@ public class AnalisadorLexico {
     }
 
     public void categorizarLexema() {
-        
+
+        if (isComentario(lexema)) { // depois mudar na main pra nao pegar mais a linha do comentario
+
+            for (int i = this.posicionamento; this.allArgs.charAt(i) != '\n'; i++) { // adicionando tudo até o final de
+                                                                                     // uma linha
+                this.posicionamento = i;
+                this.lexema += this.allArgs.charAt(i);
+            }
+
+            System.out.println(this.lexema + " Comentario!");
+            this.lexema = "";
+        }
+
         if (isNum(lexema)) {
-                    
+
             if (isNumInt(lexema)) {
-                System.out.println(this.lexema+" Número inteiro!");
+                System.out.println(this.lexema + " Número inteiro!");
                 this.lexema = "";
             } else if (isNumDec(lexema)) {
-                System.out.println(this.lexema+" Número decimal!");
+                System.out.println(this.lexema + " Número decimal!");
                 this.lexema = "";
             }
 
-        } else if  (isPalavraReservada(lexema)) { //primeiro verificar se tem palavra reservada 
-            System.out.println(this.lexema+" Palavra Reservada!");
+        } else if (isPalavraReservada(lexema)) { // primeiro verificar se tem palavra reservada
+
+            System.out.println(this.lexema + " Palavra Reservada!");
+            this.lexema = "";
+
+        } else if (isConstanteDeTexto(lexema)) { // PRECISA DO LEXEMAAUX
+
+            System.out.println(this.lexemaAux + " Constante de texto!");
+            this.lexemaAux = "";
+
+
+        }
+
+        if (lexema.equals("\n")) { // quebra de linha
             this.lexema = "";
         }
 
-        if (lexema.equals("J")) { //quebra de linha
-            this.lexema = "";
-        }
-
+        this.lexema = ""; // TIRAR ISSO DEPOIS
     }
 
-    private boolean isNum(String argumentos) { //FALTA IDENTIFICAR NUMEROS NEGATIVOS E POSITIVOS
-        if (argumentos.charAt(0) == '.' || argumentos.charAt(argumentos.length() - 1) == '.') { // caso padrão
+    private boolean isNum(String argumentos) { // FALTA IDENTIFICAR NUMEROS NEGATIVOS E POSITIVOS
+
+        if (argumentos == "" || argumentos.charAt(0) == '.' || argumentos.charAt(argumentos.length() - 1) == '.') { // caso
+                                                                                                                    // padrão
             return false;
         }
 
@@ -96,7 +156,7 @@ public class AnalisadorLexico {
             if (analiseChar == '.') {
                 count++;
 
-                if (count > 1) {
+                if (count == 2) {
                     return false;
                 }
 
@@ -111,6 +171,10 @@ public class AnalisadorLexico {
 
     private boolean isNumInt(String lexema) {
 
+        if (lexema == "") { // caso padrão
+            return false;
+        }
+
         for (int i = 0; i < lexema.length(); i++) {
             char analiseChar = lexema.charAt(i);
 
@@ -124,6 +188,10 @@ public class AnalisadorLexico {
 
     private boolean isNumDec(String lexema) {
 
+        if (lexema == "") { // caso padrão
+            return false;
+        }
+
         for (int i = 0; i < lexema.length(); i++) {
             char analiseChar = lexema.charAt(i);
 
@@ -135,26 +203,102 @@ public class AnalisadorLexico {
     }
 
     public boolean isPalavraReservada(String lexema) {
-        if (this.palavrasReservadas.contains(lexema)) {
-            return true;
-        } else {
-            return false;
-        }
+    if (lexema == null || lexema.isEmpty()) {
+        return false;
     }
+
+    // Defina um padrão de expressão regular para encontrar chamadas de função com argumentos
+    Pattern pattern = Pattern.compile("\\w+\\(.*\\)");
+
+    // Crie um matcher para encontrar correspondências no lexema
+    Matcher matcher = pattern.matcher(lexema);
+
+    // Verifique se encontrou uma correspondência
+    if (matcher.find()) {
+        String funcaoComArgumento = matcher.group();
+        // Aqui, funcaoComArgumento conterá, por exemplo, "print("a")"
+        // Você pode fazer o que quiser com essa string, por exemplo, imprimir, armazenar, etc.
+
+        // Remova o argumento da chamada de função
+        String funcaoSemArgumento = funcaoComArgumento.replaceFirst("\\(.*\\)", "()");
+        // Agora, funcaoSemArgumento conterá "print()"
+
+        // Você pode verificar se a função sem argumento está na lista de palavras reservadas
+        return this.palavrasReservadas.contains(funcaoSemArgumento);
+    }
+
+    // Se não houver chamada de função, verifique diretamente nas palavras reservadas
+    return this.palavrasReservadas.contains(lexema);
+}
 
     public boolean isConstanteDeTexto(String lexema) {
-        
+
+        if (lexema == "") {
+            return false;
+        }
+
+        this.lexemaAux = "";
+
+        for (int i = 0; i < lexema.length(); i++) {
+            char analiseChar = lexema.charAt(i);
+
+            if (analiseChar == '"') {
+
+                for (int j = i; j < lexema.length(); j++) {
+
+                    this.lexemaAux += lexema.charAt(j);
+                    analiseChar = lexema.charAt(j);
+
+                    lexema.replace(lexema.charAt(j), ' ');
+
+                    if (j > i) {
+                        if (analiseChar == '"') {
+                            return true;
+                        }
+                    }
+
+                }
+
+            }
+
+        }
+
+        return false;
     }
 
-    public boolean isComentarios(String lexema) {
+    public boolean isComentario(String lexema) {
+
+        if (lexema == "") { // caso padrão
+            return false;
+        }
+
+        int aux = 0;
+
+        for (int i = 0; i < lexema.length(); i++) {
+            char analiseChar = lexema.charAt(i);
+
+            if (analiseChar == '/') {
+
+                aux += 1;
+
+            } else if (analiseChar != '/') {
+                aux -= 1;
+            }
+
+            if (aux == 2) {
+                return true;
+            }
+
+        }
+
+        return false;
+    }
+
+    public boolean isOperador() {
 
     }
 
-    public boolean isOperadores() {
-
-    }
-
-    public boolean isSimbolosEspeciais() {
+    public boolean isSimboloEspecial() {
 
     }
 
