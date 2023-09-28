@@ -30,10 +30,14 @@ public class Main {
             analiseCharArgs = allArgs.charAt(i); // armazena o caracter atual.
             analisador.setPosicionamento(i); // salvando a localização atual do char
 
-            if (analiseCharArgs == ' ') { // caso o caracter analisador for igual a ' ', quer dizer que o primeiro
+            if (analiseCharArgs == ' ' || analisador.isSimboloEspecial(analiseCharArgs)) { // caso o caracter analisador for igual a ' ', ou igual a simbolo especial quer dizer que o primeiro
                                           // lexema foi formado //IMPORTANTE: CONDIÇÃO DO ULTIMO CARACTER DO CÓDIGO!! 
-                                          
+
                 analisador.categorizarLexema(); // categorizando o lexema
+
+                if (analisador.isSimboloEspecial(analiseCharArgs)) { //se for igual apenas a simbolo especial, imprima o simbolo especial
+                    System.out.println(analiseCharArgs+" é um simboloEspecial"); 
+                }
             
             } else {
                 analisador.adicionarAoLexema(analiseCharArgs); // incrementa todos os caracteres para formar o lexema
@@ -43,7 +47,7 @@ public class Main {
 
         }
 
-        System.out.println(allArgs);
+        System.out.println("\n\n"+allArgs);
 
     }
 

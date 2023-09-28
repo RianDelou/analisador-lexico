@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class AnalisadorLexico {
@@ -6,13 +7,16 @@ public class AnalisadorLexico {
     private int posicionamento = 0;
     private String allArgs;
     private String lexema = "";
-    private String lexemaAux = "";
     private String token = "";
     private ArrayList<String> palavrasReservadas = new ArrayList<String>();
+    private ArrayList<Character> simbolosEspeciais = new ArrayList<Character>();
+    private ArrayList<String> Operadores = new ArrayList<String>();
     private Pattern identificador = Pattern.compile("[a-zA-Z][a-zA-Z0-9]*");
     private ArrayList<String> tabelaSimbolos = new ArrayList<String>();
 
     public AnalisadorLexico() {
+
+        // TODAS AS PALARAS RESERVADAS
         this.palavrasReservadas.add("int");
         this.palavrasReservadas.add("float");
         this.palavrasReservadas.add("char");
@@ -26,14 +30,36 @@ public class AnalisadorLexico {
         this.palavrasReservadas.add("println");
         this.palavrasReservadas.add("main");
         this.palavrasReservadas.add("return");
-    }
 
-    public String getLexemaAux() {
-        return lexemaAux;
-    }
+        // TODOS OS SIMBOLOS ESPECIAIS
+        this.simbolosEspeciais.add('(');
+        this.simbolosEspeciais.add(')');
+        this.simbolosEspeciais.add('[');
+        this.simbolosEspeciais.add(']');
+        this.simbolosEspeciais.add('{');
+        this.simbolosEspeciais.add('}');
+        this.simbolosEspeciais.add(',');
+        this.simbolosEspeciais.add(';');
+        this.simbolosEspeciais.add('.');
 
-    public void setLexemaAux(String lexemaAux) {
-        this.lexemaAux = lexemaAux;
+        // TODOS OPERADORES
+        this.Operadores.add("=");
+        this.Operadores.add("+");
+        this.Operadores.add("++");
+        this.Operadores.add("-");
+         this.Operadores.add("--");
+        this.Operadores.add("*");
+        this.Operadores.add("/");
+        this.Operadores.add("%");
+        this.Operadores.add("&&");
+        this.Operadores.add("||");
+        this.Operadores.add("!");
+        this.Operadores.add(">");
+        this.Operadores.add(">=");
+        this.Operadores.add("<");
+        this.Operadores.add("<=");
+        this.Operadores.add("!=");
+        this.Operadores.add("==");
     }
 
     public int getPosicionamento() {
@@ -92,11 +118,23 @@ public class AnalisadorLexico {
         this.tabelaSimbolos = tabelaSimbolos;
     }
 
+    public ArrayList<Character> getSimbolosEspeciais() {
+        return simbolosEspeciais;
+    }
+
+    public void setSimbolosEspeciais(ArrayList<Character> simbolosEspeciais) {
+        this.simbolosEspeciais = simbolosEspeciais;
+    }
+
     public void adicionarAoLexema(char caracter) {
         this.lexema += caracter;
     }
 
     public void categorizarLexema() {
+
+        if (lexema.isEmpty()) { // caso padrão
+            return;
+        }
 
         if (isComentario(lexema)) { // depois mudar na main pra nao pegar mais a linha do comentario
 
@@ -110,7 +148,10 @@ public class AnalisadorLexico {
             this.lexema = "";
         }
 
-        if (isNum(lexema)) {
+        if (isOperador(lexema)) {
+            System.out.println(this.lexema + " Operador!");
+            lexema = "";
+        } else if (isNum(lexema)) {
 
             if (isNumInt(lexema)) {
                 System.out.println(this.lexema + " Número inteiro!");
@@ -125,11 +166,14 @@ public class AnalisadorLexico {
             System.out.println(this.lexema + " Palavra Reservada!");
             this.lexema = "";
 
-        } else if (isConstanteDeTexto(lexema)) { // PRECISA DO LEXEMAAUX (!!!!!!!!!!!!!!!)
+        } else if (isIdentificador(lexema)) { // obs: se for um numero primeiro e depois uma letra ele nao identifica como identificador e também se tiver "teste_a" ou "_a" ele nao aceita
+            System.out.println(this.lexema + " Identificador!");
+            this.lexema = "";
+        } else if (isConstanteDeTexto(lexema)) {
 
-            System.out.println(this.lexemaAux + " Constante de texto!");
-            this.lexemaAux = "";
-            
+            System.out.println(this.lexema + " Constante de texto!");
+            this.lexema = "";
+
         }
 
         if (lexema.equals("\n")) { // quebra de linha
@@ -139,17 +183,17 @@ public class AnalisadorLexico {
         this.lexema = ""; // TIRAR ISSO DEPOIS
     }
 
-    private boolean isNum(String argumentos) {
+    private boolean isNum(String lexema) {
 
-        if (argumentos == "" || argumentos.charAt(0) == '.' || argumentos.charAt(argumentos.length() - 1) == '.') { // caso
-                                                                                                                    // padrão
+        if (lexema.isEmpty() || lexema.charAt(0) == '.' || lexema.charAt(lexema.length() - 1) == '.') { // caso
+                                                                                                        // padrão
             return false;
         }
 
         int count = 0;
 
-        for (int i = 0; i < argumentos.length(); i++) {
-            char analiseChar = argumentos.charAt(i);
+        for (int i = 0; i < lexema.length(); i++) {
+            char analiseChar = lexema.charAt(i);
 
             if (analiseChar == '.') {
                 count++;
@@ -169,7 +213,7 @@ public class AnalisadorLexico {
 
     private boolean isNumInt(String lexema) {
 
-        if (lexema == "") { // caso padrão
+        if (lexema.isEmpty()) { // caso padrão
             return false;
         }
 
@@ -186,7 +230,7 @@ public class AnalisadorLexico {
 
     private boolean isNumDec(String lexema) {
 
-        if (lexema == "") { // caso padrão
+        if (lexema.isEmpty()) { // caso padrão
             return false;
         }
 
@@ -202,45 +246,42 @@ public class AnalisadorLexico {
 
     public boolean isPalavraReservada(String lexema) {
 
-        if (lexema == "") { // caso padrão
+        if (lexema.isEmpty()) { // caso padrão
             return false;
         }
 
-        if (this.palavrasReservadas.contains(lexema)) {
-            return true;
-        } else {
-            return false;
-        }
+        return this.palavrasReservadas.contains(lexema);
     }
 
     public boolean isConstanteDeTexto(String lexema) {
 
-        if (lexema == "") {
+        if (lexema.isEmpty()) {
             return false;
         }
 
-        this.lexemaAux = "";
+        int aux = 0;
 
-        for (int i = 0; i < lexema.length(); i++) {
+        for (int i = 0; i < lexema.length(); i++) { // PRIMEIRO CASO (não tem espaço)
             char analiseChar = lexema.charAt(i);
 
             if (analiseChar == '"') {
+                aux += 1;
+            }
 
-                for (int j = i; j < lexema.length(); j++) {
+            if (aux == 2) {
+                return true;
+            }
 
-                    this.lexemaAux += lexema.charAt(j);
-                    analiseChar = lexema.charAt(j);
+        }
 
-                    lexema.replace(lexema.charAt(j), ' ');
+        if (aux == 1) {
 
-                    if (j > i) {
-                        if (analiseChar == '"') {
-                            return true;
-                        }
-                    }
-
+            for (int j = this.posicionamento; j < allArgs.length(); j++) { // SEGUNDO CASO (tem espaço)
+                this.posicionamento = j;
+                this.lexema += this.allArgs.charAt(j);
+                if (this.allArgs.charAt(j) == '"') {
+                    return true; // quando for == ele vai sair
                 }
-
             }
 
         }
@@ -250,7 +291,7 @@ public class AnalisadorLexico {
 
     public boolean isComentario(String lexema) {
 
-        if (lexema == "") { // caso padrão
+        if (lexema.isEmpty()) { // caso padrão
             return false;
         }
 
@@ -276,15 +317,29 @@ public class AnalisadorLexico {
         return false;
     }
 
-    public boolean isOperador() {
+    public boolean isOperador(String lexema) {
+          if (lexema.isEmpty()) { // caso padrão
+            return false;
+        }
 
+        return this.Operadores.contains(lexema);
     }
 
-    public boolean isSimboloEspecial() {
+    public boolean isSimboloEspecial(char lexema) { // simbolo especial é utilizado para categorizar lexemas, por isso
+                                                    // eu naão utilizo essa função nessa classe, apenas na main
+
+        if (lexema == ' ') { // caso padrão
+            return false;
+        }
+
+        return this.simbolosEspeciais.contains(lexema);
 
     }
 
     public boolean isIdentificador(String lexema) {
+        Matcher matcher = identificador.matcher(lexema); //Macher é uma classe dentro da biblioteca do java que eu posso utilizar quando eu implemento a classe Pattern, para identificar a expressão regular colocada.
+
+        return matcher.matches();
 
     }
 
