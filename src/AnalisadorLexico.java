@@ -157,6 +157,7 @@ public class AnalisadorLexico {
     }
 
     public void categorizarLexema() throws Exception {
+        boolean Exception = true;
 
         if (lexema.isEmpty()) { // caso padrão
             return;
@@ -172,46 +173,55 @@ public class AnalisadorLexico {
 
             System.out.println(this.lexema+" Comentário!");
             this.lexema = "";
+            Exception = false;
         }
 
         if (isOperador(lexema)) {
 
             this.ListaTokens.add("(Op, "+lexema+")");
             lexema = "";
+            Exception = false;
 
         } else if (isNum(lexema)) {
 
             if (isNumInt(lexema)) {
                 this.ListaTokens.add("(NumInt, "+lexema+" )");
                 this.lexema = "";
+                Exception = false;
             } else if (isNumDec(lexema)) {
                 this.ListaTokens.add("(NumDec, "+lexema+" )");
                 this.lexema = "";
+                Exception = false;
             }
 
         } else if (isPalavraReservada(lexema)) { // primeiro verificar se tem palavra reservada
 
             this.ListaTokens.add("(Reservada, "+lexema+" )");
             this.lexema = "";
+            Exception = false;
 
         } else if (isIdentificador(lexema)) { // obs: se for um numero primeiro e depois uma letra ele nao identifica como identificador e também se tiver "teste_a" ou "_a" ele nao aceita
             this.contagemIdentificador++;
             this.tabelaSimbolos.add(contagemIdentificador+". "+lexema);
             this.ListaTokens.add("(ID, "+contagemIdentificador+" )");
             this.lexema = "";
+            Exception = false;
 
         } else if (isConstanteDeTexto(lexema)) {
 
             this.ListaTokens.add("(Texto, "+lexema+" )");
             this.lexema = "";
-
+            Exception = false;
         }
 
         if (lexema.equals("\n")) { // quebra de linha
             this.lexema = "";
+            Exception = false;
         }
 
-        throw new Exception("Motivo do erro: lexema inserido é inalido. lexema: "+this.lexema);
+        if (Exception) {
+            throw new Exception("Motivo do erro: lexema inserido é inalido. lexema: "+this.lexema);
+        }
 
     }
 
