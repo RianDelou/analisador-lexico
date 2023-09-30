@@ -43,7 +43,9 @@ public class AnalisadorLexico {
         this.simbolosEspeciais.add(',');
         this.simbolosEspeciais.add(';');
         this.simbolosEspeciais.add('.');
-
+        String simboloEspecialAdicional = "'";
+        this.simbolosEspeciais.add(simboloEspecialAdicional.charAt(0));
+        
         // TODOS OPERADORES
         this.Operadores.add("=");
         this.Operadores.add("+");
