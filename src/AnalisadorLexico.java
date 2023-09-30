@@ -13,6 +13,8 @@ public class AnalisadorLexico {
     private ArrayList<String> Operadores = new ArrayList<String>();
     private Pattern identificador = Pattern.compile("[a-zA-Z][a-zA-Z0-9]*");
     private ArrayList<String> tabelaSimbolos = new ArrayList<String>();
+    private ArrayList<String> ListaTokens = new ArrayList<String>();
+    private int contagemIdentificador = 0;
 
     public AnalisadorLexico() {
 
@@ -47,7 +49,7 @@ public class AnalisadorLexico {
         this.Operadores.add("+");
         this.Operadores.add("++");
         this.Operadores.add("-");
-         this.Operadores.add("--");
+        this.Operadores.add("--");
         this.Operadores.add("*");
         this.Operadores.add("/");
         this.Operadores.add("%");
@@ -60,6 +62,30 @@ public class AnalisadorLexico {
         this.Operadores.add("<=");
         this.Operadores.add("!=");
         this.Operadores.add("==");
+    }
+
+    public int getContagemIdentificador() {
+        return contagemIdentificador;
+    }
+
+    public void setContagemIdentificador(int contagemIdentificador) {
+        this.contagemIdentificador = contagemIdentificador;
+    }
+
+    public ArrayList<String> getOperadores() {
+        return Operadores;
+    }
+
+    public void setOperadores(ArrayList<String> operadores) {
+        Operadores = operadores;
+    }
+
+    public ArrayList<String> getListaTokens() {
+        return ListaTokens;
+    }
+
+    public void setListaTokens(ArrayList<String> listaTokens) {
+        this.ListaTokens = listaTokens;
     }
 
     public int getPosicionamento() {
@@ -130,7 +156,7 @@ public class AnalisadorLexico {
         this.lexema += caracter;
     }
 
-    public void categorizarLexema() {
+    public void categorizarLexema() throws Exception {
 
         if (lexema.isEmpty()) { // caso padrão
             return;
@@ -144,34 +170,39 @@ public class AnalisadorLexico {
                 this.lexema += this.allArgs.charAt(i);
             }
 
-            System.out.println(this.lexema + " Comentario!");
+            System.out.println(this.lexema+" Comentário!");
             this.lexema = "";
         }
 
         if (isOperador(lexema)) {
-            System.out.println(this.lexema + " Operador!");
+
+            this.ListaTokens.add("(Op, "+lexema+")");
             lexema = "";
+
         } else if (isNum(lexema)) {
 
             if (isNumInt(lexema)) {
-                System.out.println(this.lexema + " Número inteiro!");
+                this.ListaTokens.add("(NumInt, "+lexema+" )");
                 this.lexema = "";
             } else if (isNumDec(lexema)) {
-                System.out.println(this.lexema + " Número decimal!");
+                this.ListaTokens.add("(NumDec, "+lexema+" )");
                 this.lexema = "";
             }
 
         } else if (isPalavraReservada(lexema)) { // primeiro verificar se tem palavra reservada
 
-            System.out.println(this.lexema + " Palavra Reservada!");
+            this.ListaTokens.add("(Reservada, "+lexema+" )");
             this.lexema = "";
 
         } else if (isIdentificador(lexema)) { // obs: se for um numero primeiro e depois uma letra ele nao identifica como identificador e também se tiver "teste_a" ou "_a" ele nao aceita
-            System.out.println(this.lexema + " Identificador!");
+            this.contagemIdentificador++;
+            this.tabelaSimbolos.add(contagemIdentificador+". "+lexema);
+            this.ListaTokens.add("(ID, "+contagemIdentificador+" )");
             this.lexema = "";
+
         } else if (isConstanteDeTexto(lexema)) {
 
-            System.out.println(this.lexema + " Constante de texto!");
+            this.ListaTokens.add("(Texto, "+lexema+" )");
             this.lexema = "";
 
         }
@@ -180,7 +211,22 @@ public class AnalisadorLexico {
             this.lexema = "";
         }
 
-        this.lexema = ""; // TIRAR ISSO DEPOIS
+        throw new Exception("Motivo do erro: lexema inserido é inalido. lexema: "+this.lexema);
+
+    }
+
+    public void imprimirListas() {
+
+            System.out.println("\nTabela de Simbolos\n");
+        for (int i = 0; i < tabelaSimbolos.size(); i++) {
+            System.out.println(tabelaSimbolos.get(i));
+        }
+
+
+            System.out.println("\nLista de Tokens\n");
+        for (int i = 0; i < ListaTokens.size(); i++) {
+            System.out.println(ListaTokens.get(i));
+        }
     }
 
     private boolean isNum(String lexema) {

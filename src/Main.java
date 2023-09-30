@@ -1,7 +1,7 @@
 import java.util.Scanner;
 
 public class Main {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
         Scanner input = new Scanner(System.in);
         AnalisadorLexico analisador = new AnalisadorLexico(); // instanciando o objeto
         String argumentos = "";
@@ -35,8 +35,9 @@ public class Main {
 
                 analisador.categorizarLexema(); // categorizando o lexema
 
-                if (analisador.isSimboloEspecial(analiseCharArgs)) { //se for igual apenas a simbolo especial, imprima o simbolo especial
-                    System.out.println(analiseCharArgs+" é um simboloEspecial"); 
+                if (analisador.isSimboloEspecial(analiseCharArgs)) { //se for igual apenas a simbolo especial, adicione o simbolo especial
+                    
+                    analisador.getListaTokens().add("(SimboloEsp, "+analiseCharArgs+" )");
                 }
             
             } else {
@@ -47,7 +48,9 @@ public class Main {
 
         }
 
-        System.out.println("\n\n"+allArgs);
+        analisador.imprimirListas();
+        System.out.println("\ntodos os argumentos: \n"+allArgs+"\n");
+
 
     }
 
