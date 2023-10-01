@@ -45,7 +45,7 @@ public class AnalisadorLexico {
         this.simbolosEspeciais.add('.');
         String simboloEspecialAdicional = "'";
         this.simbolosEspeciais.add(simboloEspecialAdicional.charAt(0));
-        
+
         // TODOS OPERADORES
         this.Operadores.add("=");
         this.Operadores.add("+");
@@ -165,7 +165,7 @@ public class AnalisadorLexico {
             return;
         }
 
-        if (isComentario(lexema)) { // depois mudar na main pra nao pegar mais a linha do comentario
+        if (isComentarioEmLinha(lexema)) { // depois mudar na main pra nao pegar mais a linha do comentario
 
             for (int i = this.posicionamento; this.allArgs.charAt(i) != '\n'; i++) { // adicionando tudo até o final de
                                                                                      // uma linha
@@ -173,45 +173,50 @@ public class AnalisadorLexico {
                 this.lexema += this.allArgs.charAt(i);
             }
 
-            System.out.println(this.lexema+" Comentário!");
+            System.out.println(this.lexema + " Comentário em linha!");
+            this.lexema = "";
+            Exception = false;
+        } else if (isComentarioEmBloco(lexema)) {
+            System.out.println(this.lexema + " Comentário em bloco!");
             this.lexema = "";
             Exception = false;
         }
 
         if (isOperador(lexema)) {
 
-            this.ListaTokens.add("(Op, "+lexema+")");
+            this.ListaTokens.add("(Op, " + lexema + ")");
             lexema = "";
             Exception = false;
 
         } else if (isNum(lexema)) {
 
             if (isNumInt(lexema)) {
-                this.ListaTokens.add("(NumInt, "+lexema+" )");
+                this.ListaTokens.add("(NumInt, " + lexema + " )");
                 this.lexema = "";
                 Exception = false;
             } else if (isNumDec(lexema)) {
-                this.ListaTokens.add("(NumDec, "+lexema+" )");
+                this.ListaTokens.add("(NumDec, " + lexema + " )");
                 this.lexema = "";
                 Exception = false;
             }
 
         } else if (isPalavraReservada(lexema)) { // primeiro verificar se tem palavra reservada
 
-            this.ListaTokens.add("(Reservada, "+lexema+" )");
+            this.ListaTokens.add("(Reservada, " + lexema + " )");
             this.lexema = "";
             Exception = false;
 
-        } else if (isIdentificador(lexema)) { // obs: se for um numero primeiro e depois uma letra ele nao identifica como identificador e também se tiver "teste_a" ou "_a" ele nao aceita
+        } else if (isIdentificador(lexema)) { // obs: se for um numero primeiro e depois uma letra ele nao identifica
+                                              // como identificador e também se tiver "teste_a" ou "_a" ele nao aceita
             this.contagemIdentificador++;
-            this.tabelaSimbolos.add(contagemIdentificador+". "+lexema);
-            this.ListaTokens.add("(ID, "+contagemIdentificador+" )");
+            this.tabelaSimbolos.add(contagemIdentificador + ". " + lexema);
+            this.ListaTokens.add("(ID, " + contagemIdentificador + " )");
             this.lexema = "";
             Exception = false;
 
         } else if (isConstanteDeTexto(lexema)) {
 
-            this.ListaTokens.add("(Texto, "+lexema+" )");
+            this.ListaTokens.add("(Texto, " + lexema + " )");
             this.lexema = "";
             Exception = false;
         }
@@ -222,20 +227,19 @@ public class AnalisadorLexico {
         }
 
         if (Exception) {
-            throw new Exception("Motivo do erro: lexema inserido é inalido. lexema: "+this.lexema);
+            throw new Exception("Motivo do erro: lexema inserido é inalido. lexema: " + this.lexema);
         }
 
     }
 
     public void imprimirListas() {
 
-            System.out.println("\nTabela de Simbolos\n");
+        System.out.println("\nTabela de Simbolos\n");
         for (int i = 0; i < tabelaSimbolos.size(); i++) {
             System.out.println(tabelaSimbolos.get(i));
         }
 
-
-            System.out.println("\nLista de Tokens\n");
+        System.out.println("\nLista de Tokens\n");
         for (int i = 0; i < ListaTokens.size(); i++) {
             System.out.println(ListaTokens.get(i));
         }
@@ -347,7 +351,7 @@ public class AnalisadorLexico {
         return false;
     }
 
-    public boolean isComentario(String lexema) {
+    public boolean isComentarioEmLinha(String lexema) {
 
         if (lexema.isEmpty()) { // caso padrão
             return false;
@@ -375,8 +379,42 @@ public class AnalisadorLexico {
         return false;
     }
 
+    public boolean isComentarioEmBloco(String lexema) {
+        if (lexema.isEmpty()) { // caso padrão
+            return false;
+        }
+
+   
+        for (int i = 0; i < lexema.length(); i++) { 
+
+            if (lexema.charAt(i) == '/' && lexema.charAt(i + 1) == '*') {
+
+                for (int j = this.posicionamento; j < allArgs.length(); j++) { // APENAS FUNCIONA COM ESPAÇO
+                    this.posicionamento = j;
+                    this.lexema += this.allArgs.charAt(j);
+
+                    if (this.allArgs.charAt(j) == '*') {
+
+                        if (this.allArgs.charAt(j + 1) == '/') {
+                            this.posicionamento = j + 1;
+                            this.lexema += this.allArgs.charAt(j + 1);
+                            return true;
+                        }
+
+                    } 
+
+                }
+
+            }
+
+        }
+
+        return false;
+
+    }
+
     public boolean isOperador(String lexema) {
-          if (lexema.isEmpty()) { // caso padrão
+        if (lexema.isEmpty()) { // caso padrão
             return false;
         }
 
@@ -395,7 +433,9 @@ public class AnalisadorLexico {
     }
 
     public boolean isIdentificador(String lexema) {
-        Matcher matcher = identificador.matcher(lexema); //Macher é uma classe dentro da biblioteca do java que eu posso utilizar quando eu implemento a classe Pattern, para identificar a expressão regular colocada.
+        Matcher matcher = identificador.matcher(lexema); // Macher é uma classe dentro da biblioteca do java que eu
+                                                         // posso utilizar quando eu implemento a classe Pattern, para
+                                                         // identificar a expressão regular colocada.
 
         return matcher.matches();
 
