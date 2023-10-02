@@ -380,7 +380,7 @@ public class AnalisadorLexico {
     }
 
     public boolean isComentarioEmBloco(String lexema) {
-        if (lexema.isEmpty()) { // caso padrão
+        if (lexema.isEmpty() || lexema.length() == 1) { // caso padrão
             return false;
         }
 
