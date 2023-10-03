@@ -1,8 +1,11 @@
 import java.util.Scanner;
+import java.io.File;
 
 public class Main {
     public static void main(String[] args) throws Exception {
-        Scanner input = new Scanner(System.in);
+        File arquivo = new File("/home/riaan/codigofonte.txt"); // pega arquivo.txt
+
+        Scanner input = new Scanner(arquivo);
         AnalisadorLexico analisador = new AnalisadorLexico(); // instanciando o objeto
         String argumentos = "";
         String allArgs = "";
@@ -10,14 +13,10 @@ public class Main {
 
         System.out.println("----------código fonte----------");
 
-        while (true) {
+        while (input.hasNextLine()) { // LEMBRAR DAQUELE IF DE UMA LINHA !!!
             argumentos = input.nextLine();
 
-             allArgs += argumentos; // todos os argumentos
-
-            if (argumentos.isEmpty()) {
-                break; // sai do loop se a linha estiver em branco
-            }
+            allArgs += argumentos; // todos os argumentos
 
             allArgs += " \n "; // o \n tem que ter esse espaço entre eles, para que não bugue quando for analisar o comentário
 
@@ -35,7 +34,7 @@ public class Main {
 
                 analisador.categorizarLexema(); // categorizando o lexema
 
-                if (analisador.isSimboloEspecial(analiseCharArgs)) { //se for igual apenas a simbolo especial, adicione o simbolo especial
+                if (analisador.isSimboloEspecial(analiseCharArgs)) {  //se for igual apenas a simbolo especial, adicione o simbolo especial
                     
                     analisador.getListaTokens().add("(SimboloEsp, "+analiseCharArgs+" )");
                 }

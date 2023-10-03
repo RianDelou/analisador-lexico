@@ -42,7 +42,6 @@ public class AnalisadorLexico {
         this.simbolosEspeciais.add('}');
         this.simbolosEspeciais.add(',');
         this.simbolosEspeciais.add(';');
-        this.simbolosEspeciais.add('.');
         String simboloEspecialAdicional = "'";
         this.simbolosEspeciais.add(simboloEspecialAdicional.charAt(0));
 
@@ -208,11 +207,28 @@ public class AnalisadorLexico {
 
         } else if (isIdentificador(lexema)) { // obs: se for um numero primeiro e depois uma letra ele nao identifica
                                               // como identificador e também se tiver "teste_a" ou "_a" ele nao aceita
-            this.contagemIdentificador++;
-            this.tabelaSimbolos.add(contagemIdentificador + ". " + lexema);
-            this.ListaTokens.add("(ID, " + contagemIdentificador + " )");
-            this.lexema = "";
-            Exception = false;
+
+            if (!tabelaSimbolos.contains(lexema)) {
+
+                this.contagemIdentificador++;
+                this.tabelaSimbolos.add(lexema);
+                this.ListaTokens.add("(ID, " + contagemIdentificador + " )");
+                this.lexema = "";
+                Exception = false;
+
+            } else if (tabelaSimbolos.contains(lexema)) {
+                for (int i = 0;  i < tabelaSimbolos.size(); i++) {
+
+                    if (tabelaSimbolos.get(i).equals(lexema)) {
+                        i += 1;
+                        this.ListaTokens.add("(ID, " + i + " )");
+                        this.lexema = "";
+                        Exception = false;
+                        break;
+                    }
+
+                }
+            }
 
         } else if (isConstanteDeTexto(lexema)) {
 
@@ -236,7 +252,7 @@ public class AnalisadorLexico {
 
         System.out.println("\nTabela de Simbolos\n");
         for (int i = 0; i < tabelaSimbolos.size(); i++) {
-            System.out.println(tabelaSimbolos.get(i));
+            System.out.println((i + 1) +". "+ tabelaSimbolos.get(i));
         }
 
         System.out.println("\nLista de Tokens\n");
@@ -324,7 +340,7 @@ public class AnalisadorLexico {
         int aux = 0;
 
         for (int i = 0; i < lexema.length(); i++) { // PRIMEIRO CASO (não tem espaço)
-            char analiseChar = lexema.charAt(i);
+            char analiseChar = lexema.charAt(i);  
 
             if (analiseChar == '"') {
                 aux += 1;
